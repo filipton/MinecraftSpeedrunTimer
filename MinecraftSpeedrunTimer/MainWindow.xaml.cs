@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Octokit;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -74,6 +75,20 @@ namespace MinecraftSpeedrunTimer
 
 			Title = "MinecraftSpeedrunTimer";
 
+			//---------------------------------------------CHECK FOR UPDATE---------------------------------------------//
+			var github = new GitHubClient(new ProductHeaderValue("MinecraftSpeedrunTimerVC"));
+			string latestReleaseVersion = github.Repository.Release.GetLatest("filipton", "MinecraftSpeedrunTimer").Result.TagName;
+
+			string version = FileVersionInfo.GetVersionInfo(Assembly.GetExecutingAssembly().Location).FileVersion;
+
+			if (latestReleaseVersion != version)
+			{
+				if(MessageBox.Show("Please download latest version! Do you want to go to the latest release page?", $"YOU ARE NOT RUNNING LATEST VERSION! ({version} vs {latestReleaseVersion})", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+				{
+					Process.Start("https://github.com/filipton/MinecraftSpeedrunTimer/releases/latest");
+					Environment.Exit(0);
+				}
+			}
 
 			//-------------------------------------------------SETTINGS-------------------------------------------------//
 			string jsonPath = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), "settings.json");
