@@ -27,12 +27,14 @@ public struct Settings
 	public FColor BackgroundColor;
 	public FColor TextColor;
 	public double WindowSizeMultiplier;
+	public string MinecraftSavesPath;
 
-	public Settings(FColor backColor, FColor txtColor, double windowSizeMultiplier)
+	public Settings(FColor backColor, FColor txtColor, double windowSizeMultiplier, string minecraftSavesPath)
 	{
 		BackgroundColor = backColor;
 		TextColor = txtColor;
 		WindowSizeMultiplier = windowSizeMultiplier;
+		MinecraftSavesPath = minecraftSavesPath;
 	}
 }
 
@@ -59,6 +61,8 @@ namespace MinecraftSpeedrunTimer
 		public Stopwatch rtlTimer = new Stopwatch();
 
 		public string oldPath = string.Empty;
+
+		public Settings settings;
 
 		public MainWindow()
 		{
@@ -96,7 +100,7 @@ namespace MinecraftSpeedrunTimer
 			{
 				if (!File.Exists(jsonPath))
 				{
-					Settings tmpsettings = new Settings(new FColor(23, 154, 41), new FColor(255, 255, 255), 1);
+					Settings tmpsettings = new Settings(new FColor(23, 154, 41), new FColor(255, 255, 255), 1, System.IO.Path.Combine(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ".minecraft"), "saves"));
 					string json = JsonConvert.SerializeObject(tmpsettings);
 
 					File.WriteAllText(jsonPath, json);
@@ -104,17 +108,21 @@ namespace MinecraftSpeedrunTimer
 
 				Settings settings = JsonConvert.DeserializeObject<Settings>(File.ReadAllText(jsonPath));
 				ChangeSettings(settings);
+
+				this.settings = settings;
+				Console.WriteLine(this.settings.MinecraftSavesPath);
 			}
 			catch(Exception e)
 			{
 				if(e is Newtonsoft.Json.JsonReaderException)
 				{
-					Settings tmpsettings = new Settings(new FColor(23, 154, 41), new FColor(255, 255, 255), 1);
+					Settings tmpsettings = new Settings(new FColor(23, 154, 41), new FColor(255, 255, 255), 1, System.IO.Path.Combine(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ".minecraft"), "saves"));
 					string json = JsonConvert.SerializeObject(tmpsettings);
 
 					File.WriteAllText(jsonPath, json);
 
 					ChangeSettings(tmpsettings);
+					settings = tmpsettings;
 				}
 			}
 		}
@@ -123,7 +131,7 @@ namespace MinecraftSpeedrunTimer
 		{
 			try
 			{
-				string path = System.IO.Path.Combine(System.IO.Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), ".minecraft"), "saves");
+				string path = settings.MinecraftSavesPath;
 				var allsaves = Directory.GetDirectories(path).Select(x => new DirectoryInfo(x));
 
 				DateTime ldt = DateTime.Today;

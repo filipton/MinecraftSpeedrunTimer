@@ -10,6 +10,7 @@ Basic timer in WPF for speedruning minecraft (any version)
 * Background Color (default is green for `Color Key` in obs) [In RGB]
 * Text Color (default is white) [In RGB]
 * Window Size Multiplier (default is 1, its for changing window and content size) [In double]
+* Minecraft Saves Path
 
 ## How to edit settings?
 * Open settings.json from program directory
